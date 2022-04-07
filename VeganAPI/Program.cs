@@ -1,3 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using VeganAPI.Configuration;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -20,6 +24,12 @@ builder.Services.AddCors(options =>
                 .SetIsOriginAllowed(_ => true);
         });
 });
+
+//Configure Database Settings
+builder.Services.Configure<MongoDbConnectionSettings>(
+    builder.Configuration.GetSection(nameof(MongoDbConnectionSettings)));
+builder.Services.AddSingleton<IMongoDbConnectionSettings>(provider =>
+    provider.GetRequiredService<IOptions<MongoDbConnectionSettings>>().Value);
 
 var app = builder.Build();
 
