@@ -8,7 +8,6 @@ public class ProductQueryOptions
     
     public string StoreName { get; set; }
 
-    public int? ZipCode { get; set; }
+    public IList<int>? ZipCode { get; set; }
     
-    public int? Distance { get; set; }
 }

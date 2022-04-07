@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using VeganAPI.Configuration;
 
@@ -14,7 +15,7 @@ public class MongoProductSource : IMongoProductSource
         _products = database.GetCollection<Product>(settings.ProductsCollectionName);
     }
     
-    public async Task<IList<Product>> GetProducts(ProductQueryOptions queryOptions, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<IList<Product>>> GetProducts(ProductQueryOptions queryOptions, CancellationToken cancellationToken = default)
     {
         var builder = Builders<Product>.Filter;
         var filter = builder.Empty;
@@ -28,16 +29,29 @@ public class MongoProductSource : IMongoProductSource
             filter &= builder.Where(x => x.Sightings.All(y => y.Store.Name == queryOptions.StoreName));
         }
 
-        if (queryOptions.ZipCode.HasValue && queryOptions.Distance.HasValue)
+        var zipcodes = queryOptions.ZipCode ?? new List<int>();
+
+        if (zipcodes.Any())
         {
-            filter &= builder.Where(x => x.ZipCodes.All(Math.Sqrt(
-                
-                )))
+            filter &= builder.Where(x => x.ZipCodes.All(y => zipcodes.Contains(y)));
         }
+
+        var products = await _products.Find(filter).ToListAsync(cancellationToken);
+
+        return products;
     }
 
-    public async Task<Product> GetProductById(ProductQueryOptions queryOptions, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<Product>> GetProductById(Guid id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var builder = Builders<Product>.Filter.Eq(x => x.Id, id);
+        var productList = await _products.Find(builder).ToListAsync(cancellationToken);
+        var product = productList.FirstOrDefault();
+
+        if (product == null)
+        {
+            return new ActionResult<Product>(new NotFoundResult());
+        }
+
+        return product;
     }
 }
