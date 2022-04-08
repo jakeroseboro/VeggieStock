@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using VeganAPI.Configuration;
+using VeganAPI.Models.Products;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,9 @@ builder.Services.Configure<MongoDbConnectionSettings>(
     builder.Configuration.GetSection(nameof(MongoDbConnectionSettings)));
 builder.Services.AddSingleton<IMongoDbConnectionSettings>(provider =>
     provider.GetRequiredService<IOptions<MongoDbConnectionSettings>>().Value);
+
+//Configure product services
+builder.Services.AddProductServices();
 
 var app = builder.Build();
 
