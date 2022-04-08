@@ -39,7 +39,9 @@ public class MongoProductSink : IProductMongoSink
         if (sighting == null)
         {
             product.Sightings.Add(updateOptions.Sighting);
+            product.ZipCodes.Add(updateOptions.Sighting.ZipCode);
             updates.Add(update.Set(x => x.Sightings, product.Sightings)); 
+            updates.Add(update.Set(x => x.ZipCodes, product.ZipCodes)); 
         }
         else
         {
