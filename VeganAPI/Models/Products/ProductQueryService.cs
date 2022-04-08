@@ -4,13 +4,43 @@ namespace VeganAPI.Models.Products;
 
 public class ProductQueryService : IProductQueryService
 {
-    public Task<ActionResult<IList<Product>>> GetProducts(ProductQueryOptions queryOptions, CancellationToken cancellationToken = default)
+    private readonly IMongoProductSource _source;
+
+    public ProductQueryService(IMongoProductSource source)
     {
-        throw new NotImplementedException();
+        _source = source;
     }
 
-    public Task<ActionResult<Product>> GetProductById(ProductQueryOptions queryOptions, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<IList<Product>>> GetProducts(ProductQueryOptions queryOptions,
+        CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var results = await _source.GetProducts(queryOptions, cancellationToken);
+            return results;
+        }
+        catch (Exception e)
+        {
+            return new ObjectResult(new {error = "Unable to find the requested products"})
+            {
+                StatusCode = 500
+            };
+        }
+    }
+
+    public async Task<ActionResult<Product>> GetProductById(Guid id, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var results = await _source.GetProductById(id, cancellationToken);
+            return results;
+        }
+        catch (Exception e)
+        {
+            return new ObjectResult(new {error = $"Unable to find the requested product {id} due to {e}"})
+            {
+                StatusCode = 500
+            };
+        }
     }
 }

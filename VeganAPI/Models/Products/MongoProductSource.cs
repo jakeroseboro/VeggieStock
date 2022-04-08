@@ -47,11 +47,6 @@ public class MongoProductSource : IMongoProductSource
         var productList = await _products.Find(builder).ToListAsync(cancellationToken);
         var product = productList.FirstOrDefault();
 
-        if (product == null)
-        {
-            return new ActionResult<Product>(new NotFoundResult());
-        }
-
-        return product;
+        return product ?? new ActionResult<Product>(new NotFoundResult());
     }
 }
