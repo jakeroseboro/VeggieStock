@@ -24,4 +24,11 @@ public class ProductsController : ControllerBase
         var result = await _queryService.GetProducts(queryOptions, CancellationToken.None);
         return result;
     }
+    
+    [HttpGet("{productId:Guid}")] 
+    public async Task<ActionResult<Product>> GetProductById([FromRoute] Guid productId)
+    {
+        var result = await _queryService.GetProductById(productId, CancellationToken.None);
+        return result;
+    }
 }
