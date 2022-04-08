@@ -28,13 +28,28 @@ public class MongoProductSink : IProductMongoSink
         return product;
     }
 
-    public async Task<ActionResult<Product>> UpdateProduct(ProductUpdateOptions updateOptions, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<Product>> UpdateProduct(Product product, ProductUpdateOptions updateOptions, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
-    }
+        var update = Builders<Product>.Update;
+        var updates = new List<UpdateDefinition<Product>>();
+        var filter = Builders<Product>.Filter.Eq(x => x.Id, updateOptions.Id);
 
-    public async Task<ActionResult<Product>> UpdateProductSightings(ProductUpdateOptions updateOptions, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
+        var sightings = product.Sightings;
+        var sighting = sightings.FirstOrDefault(x => x.Store == updateOptions.Sighting.Store && x.ZipCode == updateOptions.Sighting.ZipCode);
+        if (sighting == null)
+        {
+            product.Sightings.Add(updateOptions.Sighting);
+            updates.Add(update.Set(x => x.Sightings, product.Sightings)); 
+        }
+        else
+        {
+            updates.Add(update.Set(x => x.Sightings.FirstOrDefault(y => y == sighting), updateOptions.Sighting));
+        }
+
+        var result = await _products.FindOneAndUpdateAsync(filter, update.Combine(updates),
+            new FindOneAndUpdateOptions<Product> {IsUpsert = false, ReturnDocument = ReturnDocument.After},
+            cancellationToken);
+
+        return result;
     }
 }

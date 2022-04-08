@@ -47,6 +47,14 @@ public class MongoProductSource : IMongoProductSource
         var productList = await _products.Find(builder).ToListAsync(cancellationToken);
         var product = productList.FirstOrDefault();
 
-        return product ?? new ActionResult<Product>(new NotFoundResult());
+        if (product == null)
+        {
+            return new ObjectResult(new {error = $"Unable to find product"})
+            {
+                StatusCode = 500
+            };
+        }
+
+        return product;
     }
 }

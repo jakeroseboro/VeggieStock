@@ -5,16 +5,27 @@ namespace VeganAPI.Models.Products;
 public class ProductUpdateService : IProductUpdateService
 {
     private readonly IProductMongoSink _sink;
+    private readonly IMongoProductSource _source;
 
-    public ProductUpdateService(IProductMongoSink sink)
+    public ProductUpdateService(IProductMongoSink sink, IMongoProductSource source)
     {
         _sink = sink;
+        _source = source;
     }
     public async Task<ActionResult<Product>> UpdateProduct(ProductUpdateOptions updateOptions, CancellationToken cancellationToken = default)
     {
         try
         {
-            var results = await _sink.UpdateProduct(updateOptions, cancellationToken);
+            var product = await _source.GetProductById(updateOptions.Id);
+            if (product.Value == null)
+            {
+                return new ObjectResult(new {error = $"Unable to find product"})
+                {
+                    StatusCode = 500
+                };
+            }
+            
+            var results = await _sink.UpdateProduct(product.Value, updateOptions, cancellationToken);
             return results;
         }
         catch (Exception e)
@@ -23,12 +34,8 @@ public class ProductUpdateService : IProductUpdateService
             {
                 StatusCode = 500
             };
+            
         }
         
-    }
-
-    public async Task<ActionResult<Product>> UpdateProductSighting(ProductUpdateOptions updateOptions, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
     }
 }
