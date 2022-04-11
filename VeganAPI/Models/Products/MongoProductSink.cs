@@ -16,8 +16,9 @@ public class MongoProductSink : IProductMongoSink
 
         var indexBuilder = Builders<Product>.IndexKeys;
         var indexModel = new CreateIndexModel<Product>(indexBuilder
-            .Ascending(x => x.Id)
-            .Ascending(x => x.Name), new CreateIndexOptions{ Unique = true }
+                .Ascending(x => x.Name)
+                .Ascending(x => x.Brand),
+                new CreateIndexOptions{ Unique = true }
         );
         _products.Indexes.CreateOneAsync(indexModel, cancellationToken: CancellationToken.None);
 

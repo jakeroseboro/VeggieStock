@@ -10,10 +10,8 @@ public class NewProduct
     public Sighting Sighting { get; set; }
 
     public string Brand { get; set; }
-    
-    
+
     public ProductType Type { get; set; }
-    
     
     public string CreatedBy { get; set; }
     

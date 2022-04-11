@@ -42,6 +42,7 @@ public class ProductsController : ControllerBase
     [HttpPost(Name = nameof(CreateProduct))] 
     public async Task<ActionResult<Product>> CreateProduct([FromBody] NewProduct newProduct)
     {
+        newProduct.Sighting.Seen = DateTime.Now;
         var result = await _creationService.CreateProduct(newProduct, HttpContext.RequestAborted);
         return result;
     }
