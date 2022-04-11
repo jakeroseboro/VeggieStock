@@ -1,4 +1,5 @@
-using VeganAPI.Models.Stores;
+using VeganAPI.Models.Products.Enums;
+using VeganAPI.Models.Products.Subclasses;
 
 namespace VeganAPI.Models.Products;
 
@@ -8,7 +9,13 @@ public class NewProduct
     
     public Sighting Sighting { get; set; }
 
-    public string Description { get; set; }
+    public string Brand { get; set; }
+    
+    
+    public ProductType Type { get; set; }
+    
+    
+    public string CreatedBy { get; set; }
     
     public IList<string> Images { get; set; }
     

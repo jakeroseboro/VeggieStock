@@ -1,4 +1,4 @@
-using VeganAPI.Models.Stores;
+using VeganAPI.Models.Products.Subclasses;
 
 namespace VeganAPI.Models.Products;
 

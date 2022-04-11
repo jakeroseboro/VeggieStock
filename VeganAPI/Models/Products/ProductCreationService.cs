@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using VeganAPI.Models.Products.Subclasses;
 
 namespace VeganAPI.Models.Products;
 
@@ -19,7 +20,9 @@ public class ProductCreationService : IProductCreationService
             {
                 Id = Guid.NewGuid(),
                 CoverImage = newProduct.CoverImage,
-                Description = newProduct.Description,
+                Brand = newProduct.Brand,
+                Type = newProduct.Type,
+                CreatedBy = newProduct.CreatedBy,
                 Images = newProduct.Images,
                 Name = newProduct.Name,
                 IsDeleted = false,

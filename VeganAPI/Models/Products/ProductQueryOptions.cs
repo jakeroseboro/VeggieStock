@@ -1,5 +1,3 @@
-using VeganAPI.Models.Stores;
-
 namespace VeganAPI.Models.Products;
 
 public class ProductQueryOptions
