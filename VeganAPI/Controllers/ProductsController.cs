@@ -18,17 +18,31 @@ public class ProductsController : ControllerBase
         _queryService = queryService;
     }
 
-    [HttpGet] 
+    [HttpGet(Name = nameof(GetProducts))] 
     public async Task<ActionResult<IList<Product>>> GetProducts([FromQuery] ProductQueryOptions queryOptions)
     {
-        var result = await _queryService.GetProducts(queryOptions, CancellationToken.None);
+        var result = await _queryService.GetProducts(queryOptions, HttpContext.RequestAborted);
         return result;
     }
     
-    [HttpGet("{productId:Guid}")] 
+    [HttpGet("{productId:Guid}", Name = nameof(GetProductById))] 
     public async Task<ActionResult<Product>> GetProductById([FromRoute] Guid productId)
     {
-        var result = await _queryService.GetProductById(productId, CancellationToken.None);
+        var result = await _queryService.GetProductById(productId, HttpContext.RequestAborted);
+        return result;
+    }
+    
+    [HttpPatch(Name = nameof(UpdateProduct))] 
+    public async Task<ActionResult<Product>> UpdateProduct([FromBody] ProductUpdateOptions updateOptions)
+    {
+        var result = await _productUpdateService.UpdateProduct(updateOptions, HttpContext.RequestAborted);
+        return result;
+    }
+    
+    [HttpPost(Name = nameof(CreateProduct))] 
+    public async Task<ActionResult<Product>> CreateProduct([FromBody] NewProduct newProduct)
+    {
+        var result = await _creationService.CreateProduct(newProduct, HttpContext.RequestAborted);
         return result;
     }
 }

@@ -5,6 +5,8 @@ VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VeganAPI", "VeganAPI\VeganAPI.csproj", "{3F0DAF5C-4D9A-4379-B304-4B5FD23962A0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VeganApi.Tests", "VeganApi.Tests\VeganApi.Tests.csproj", "{EA63CDFE-0541-4150-AA4D-63D009AC930E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{3F0DAF5C-4D9A-4379-B304-4B5FD23962A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F0DAF5C-4D9A-4379-B304-4B5FD23962A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F0DAF5C-4D9A-4379-B304-4B5FD23962A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA63CDFE-0541-4150-AA4D-63D009AC930E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA63CDFE-0541-4150-AA4D-63D009AC930E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA63CDFE-0541-4150-AA4D-63D009AC930E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA63CDFE-0541-4150-AA4D-63D009AC930E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
