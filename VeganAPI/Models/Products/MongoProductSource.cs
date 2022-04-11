@@ -21,19 +21,19 @@ public class MongoProductSource : IMongoProductSource
         var filter = builder.Empty;
         if (!string.IsNullOrWhiteSpace(queryOptions.Name))
         {
-            filter &= builder.Eq(x => x.Name.ToLowerInvariant(), queryOptions.Name);
+            filter &= builder.Eq(x => x.Name, queryOptions.Name);
         }
 
         if (!string.IsNullOrWhiteSpace(queryOptions.StoreName))
         {
-            filter &= builder.Where(x => x.Sightings.All(y => y.Store.Name == queryOptions.StoreName));
+            filter &= builder.Where(x => x.Sightings.Any(y => y.Store.Name == queryOptions.StoreName));
         }
 
-        var zipcodes = queryOptions.ZipCode ?? new List<int>();
+        var zipcodes = queryOptions.ZipCodes ?? new List<int>();
 
         if (zipcodes.Any())
         {
-            filter &= builder.Where(x => x.ZipCodes.All(y => zipcodes.Contains(y)));
+            filter &= builder.Where(x => x.ZipCodes.Any(y => zipcodes.Contains(y)));
         }
 
         var products = await _products.Find(filter).ToListAsync(cancellationToken);

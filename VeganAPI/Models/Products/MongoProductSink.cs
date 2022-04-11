@@ -36,7 +36,11 @@ public class MongoProductSink : IProductMongoSink
         var filter = Builders<Product>.Filter.Eq(x => x.Id, updateOptions.Id);
 
         var sightings = product.Sightings;
-        var sighting = sightings.FirstOrDefault(x => x.Store == updateOptions.Sighting.Store && x.ZipCode == updateOptions.Sighting.ZipCode);
+        
+        //Get the sighting that matches the store and address 
+        var sighting = sightings.FirstOrDefault(x => x.Store.Name == updateOptions.Sighting.Store.Name && x.ZipCode == updateOptions.Sighting.ZipCode && x.Street == updateOptions.Sighting.Street);
+        
+        //If this sighting does not exist, add a new one
         if (sighting == null)
         {
             product.Sightings.Add(updateOptions.Sighting);
@@ -44,9 +48,13 @@ public class MongoProductSink : IProductMongoSink
             updates.Add(update.Set(x => x.Sightings, product.Sightings)); 
             updates.Add(update.Set(x => x.ZipCodes, product.ZipCodes)); 
         }
+        //If this sighting does exist, update it
         else
         {
-            updates.Add(update.Set(x => x.Sightings.FirstOrDefault(y => y == sighting), updateOptions.Sighting));
+            sighting.Seen = updateOptions.Sighting.Seen;
+            sighting.SpottedBy = updateOptions.Sighting.SpottedBy;
+            
+            updates.Add(update.Set(x => x.Sightings, sightings));
         }
 
         var result = await _products.FindOneAndUpdateAsync(filter, update.Combine(updates),

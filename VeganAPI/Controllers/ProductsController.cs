@@ -21,29 +21,72 @@ public class ProductsController : ControllerBase
     [HttpGet(Name = nameof(GetProducts))] 
     public async Task<ActionResult<IList<Product>>> GetProducts([FromQuery] ProductQueryOptions queryOptions)
     {
-        var result = await _queryService.GetProducts(queryOptions, HttpContext.RequestAborted);
-        return result;
+        try
+        {
+            var result = await _queryService.GetProducts(queryOptions, HttpContext.RequestAborted);
+            return result;
+        }
+        catch (Exception e)
+        {
+            return new ObjectResult($"Unable to find products due to {e}")
+            {
+                StatusCode = 500
+            };
+        }
+        
     }
     
     [HttpGet("{productId:Guid}", Name = nameof(GetProductById))] 
     public async Task<ActionResult<Product>> GetProductById([FromRoute] Guid productId)
     {
-        var result = await _queryService.GetProductById(productId, HttpContext.RequestAborted);
-        return result;
+        try
+        {
+            var result = await _queryService.GetProductById(productId, HttpContext.RequestAborted);
+            return result;
+        }
+        catch (Exception e)
+        {
+            return new ObjectResult($"Unable to find product due to {e}")
+            {
+                StatusCode = 500
+            };
+        }
+        
     }
     
     [HttpPatch(Name = nameof(UpdateProduct))] 
     public async Task<ActionResult<Product>> UpdateProduct([FromBody] ProductUpdateOptions updateOptions)
     {
-        var result = await _productUpdateService.UpdateProduct(updateOptions, HttpContext.RequestAborted);
-        return result;
+        try
+        {
+            updateOptions.Sighting.Seen = DateTime.Now;
+            var result = await _productUpdateService.UpdateProduct(updateOptions, HttpContext.RequestAborted);
+            return result;
+        }
+        catch (Exception e)
+        {
+            return new ObjectResult($"Unable to update product due to {e}")
+            {
+                StatusCode = 500
+            };
+        }
     }
     
     [HttpPost(Name = nameof(CreateProduct))] 
     public async Task<ActionResult<Product>> CreateProduct([FromBody] NewProduct newProduct)
     {
-        newProduct.Sighting.Seen = DateTime.Now;
-        var result = await _creationService.CreateProduct(newProduct, HttpContext.RequestAborted);
-        return result;
+        try
+        {
+            newProduct.Sighting.Seen = DateTime.Now;
+            var result = await _creationService.CreateProduct(newProduct, HttpContext.RequestAborted);
+            return result;
+        }
+        catch (Exception e)
+        {
+            return new ObjectResult($"Unable to create product due to {e}")
+            {
+                StatusCode = 500
+            };
+        }
     }
 }

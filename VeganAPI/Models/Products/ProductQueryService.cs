@@ -21,7 +21,7 @@ public class ProductQueryService : IProductQueryService
         }
         catch (Exception e)
         {
-            return new ObjectResult(new {error = "Unable to find the requested products"})
+            return new ObjectResult(new {error = $"Unable to find the requested products due to {e}"})
             {
                 StatusCode = 500
             };
