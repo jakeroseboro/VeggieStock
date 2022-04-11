@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
-using VeganAPI.Configuration;
 using VeganAPI.Models.Products;
 using VeganAPI.Models.Products.Enums;
 using VeganAPI.Models.Products.Subclasses;
@@ -13,21 +11,16 @@ using Moq;
 
 namespace VeganApi.Tests.Products;
 
-public class ProductCreationServiceTests : IDisposable
+public class ProductCreationServiceTests
 {
     private readonly IProductCreationService _creationService;
     private static NewProduct _newProduct = new NewProduct();
     private static Product _product = new Product();
-    private IList<Guid> _ids;
-    private Mock<IProductMongoSink> sink = new Mock<IProductMongoSink>();
+    private readonly Mock<IProductMongoSink> _sink = new Mock<IProductMongoSink>();
 
     public ProductCreationServiceTests()
     {
-        _creationService = new ProductCreationService(sink.Object);
-    }
-    
-    public void Dispose()
-    {
+        _creationService = new ProductCreationService(_sink.Object);
     }
 
     [Fact]
@@ -61,6 +54,7 @@ public class ProductCreationServiceTests : IDisposable
             City = "Pensacola",
             Seen = DateTime.Now,
             SpottedBy = "jakeroseboro@gmail.com",
+            Street = "Creighton",
             State = "Fl",
             Store = new Store
             {
@@ -93,9 +87,9 @@ public class ProductCreationServiceTests : IDisposable
         _product = product;
     }
 
-    public void GivenSinkReturnsProduct()
+    private void GivenSinkReturnsProduct()
     {
-        sink.Setup(x => x.CreateProduct(It.IsAny<Product>(), It.IsAny<CancellationToken>()))
+        _sink.Setup(x => x.CreateProduct(It.IsAny<Product>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ActionResult<Product>(_product));
     }
     
