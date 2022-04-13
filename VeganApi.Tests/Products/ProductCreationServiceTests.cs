@@ -38,7 +38,6 @@ public class ProductCreationServiceTests
     private void AssertCorrectProduct(Product product)
     {
         _newProduct.Brand.Should().BeEquivalentTo(product.Brand);
-        _newProduct.Images.Should().BeEquivalentTo(product.Images);
         _newProduct.Name.Should().BeEquivalentTo(product.Name);
         _newProduct.Sighting.Should().BeEquivalentTo(product.Sightings[0]);
         _newProduct.CreatedBy.Should().BeEquivalentTo(product.CreatedBy);
@@ -47,7 +46,6 @@ public class ProductCreationServiceTests
     private void CreateNewProduct()
     {
         _newProduct.Brand = "Gardein";
-        _newProduct.Images = new List<string> {"Base64String"};
         _newProduct.Name = "Mandarin Orange Chik'n";
         _newProduct.Sighting = new Sighting
         {
@@ -76,7 +74,6 @@ public class ProductCreationServiceTests
             Brand = _newProduct.Brand,
             Type = _newProduct.Type,
             CreatedBy = _newProduct.CreatedBy,
-            Images = _newProduct.Images,
             Name = _newProduct.Name,
             IsDeleted = false,
             LastSpotted = DateTime.Now,

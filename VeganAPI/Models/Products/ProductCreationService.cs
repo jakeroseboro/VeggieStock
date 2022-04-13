@@ -23,7 +23,6 @@ public class ProductCreationService : IProductCreationService
                 Brand = newProduct.Brand,
                 Type = newProduct.Type,
                 CreatedBy = newProduct.CreatedBy,
-                Images = newProduct.Images,
                 Name = newProduct.Name,
                 IsDeleted = false,
                 LastSpotted = DateTime.Now,

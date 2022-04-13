@@ -15,7 +15,5 @@ public class NewProduct
     
     public string CreatedBy { get; set; }
     
-    public IList<string> Images { get; set; }
-    
     public string CoverImage { get; set; }
 }
