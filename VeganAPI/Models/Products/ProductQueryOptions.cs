@@ -8,4 +8,5 @@ public class ProductQueryOptions
 
     public IList<int>? ZipCodes { get; set; }
     
+    public string? CreatedBy { get; set; }
 }

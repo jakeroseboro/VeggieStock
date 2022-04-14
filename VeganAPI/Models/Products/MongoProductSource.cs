@@ -36,6 +36,11 @@ public class MongoProductSource : IMongoProductSource
             filter &= builder.Where(x => x.ZipCodes.Any(y => zipcodes.Contains(y)));
         }
 
+        if (!string.IsNullOrWhiteSpace(queryOptions.CreatedBy))
+        {
+            filter &= builder.Eq(x => x.CreatedBy, queryOptions.CreatedBy);
+        }
+
         var products = await _products.Find(filter).ToListAsync(cancellationToken);
 
         return products;

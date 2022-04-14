@@ -57,6 +57,11 @@ public class MongoProductSink : IProductMongoSink
             updates.Add(update.Set(x => x.Sightings, sightings));
         }
 
+        if (updateOptions.IsDeleted.HasValue)
+        {
+            updates.Add(update.Set(x => x.IsDeleted, updateOptions.IsDeleted));
+        }
+
         var result = await _products.FindOneAndUpdateAsync(filter, update.Combine(updates),
             new FindOneAndUpdateOptions<Product> {IsUpsert = false, ReturnDocument = ReturnDocument.After},
             cancellationToken);
