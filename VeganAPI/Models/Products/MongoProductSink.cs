@@ -44,7 +44,10 @@ public class MongoProductSink : IProductMongoSink
         if (sighting == null)
         {
             product.Sightings.Add(updateOptions.Sighting);
-            product.ZipCodes.Add(updateOptions.Sighting.ZipCode);
+            if (!product.ZipCodes.Contains(updateOptions.Sighting.ZipCode))
+            {
+                product.ZipCodes.Add(updateOptions.Sighting.ZipCode);
+            }
             updates.Add(update.Set(x => x.Sightings, product.Sightings)); 
             updates.Add(update.Set(x => x.ZipCodes, product.ZipCodes)); 
         }
@@ -53,9 +56,9 @@ public class MongoProductSink : IProductMongoSink
         {
             sighting.Seen = updateOptions.Sighting.Seen;
             sighting.SpottedBy = updateOptions.Sighting.SpottedBy;
-            updates.Add(update.Set(x => x.LastSpotted, updateOptions.Sighting.Seen));
             updates.Add(update.Set(x => x.Sightings, sightings));
         }
+        updates.Add(update.Set(x => x.LastSpotted, updateOptions.Sighting.Seen));
 
         if (updateOptions.IsDeleted.HasValue)
         {
