@@ -53,7 +53,7 @@ public class MongoProductSink : IProductMongoSink
         {
             sighting.Seen = updateOptions.Sighting.Seen;
             sighting.SpottedBy = updateOptions.Sighting.SpottedBy;
-            
+            updates.Add(update.Set(x => x.LastSpotted, updateOptions.Sighting.Seen));
             updates.Add(update.Set(x => x.Sightings, sightings));
         }
 
