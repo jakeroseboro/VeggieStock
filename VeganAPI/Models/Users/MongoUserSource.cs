@@ -13,7 +13,7 @@ public class MongoUserSource: IMongoUserSource
     {
         var client = new MongoClient(settings.ConnectionString);
         var database = client.GetDatabase(settings.DatabaseName);
-        _users = database.GetCollection<User>(settings.ProductsCollectionName);
+        _users = database.GetCollection<User>(settings.UsersCollectionName);
     }
     public async Task<ActionResult<User>> GetUser(UserQueryOptions queryOptions, CancellationToken cancellationToken = default)
     {
@@ -21,25 +21,34 @@ public class MongoUserSource: IMongoUserSource
         var filter = builder.Empty;
 
         var crypto = new UserCrypto();
-        var decrypted = DecryptPassword(queryOptions.Password, crypto.Salt);
-        filter &= builder.Eq(x => x.UserName, decrypted);
-        filter &= builder.Eq(x => x.Password, queryOptions.Password);
+        var encrypted = EncryptPassword(queryOptions.Password, crypto.Salt);
+        filter &= builder.Eq(x => x.UserName, queryOptions.UserName);
+        filter &= builder.Eq(x => x.Password, encrypted);
 
         var products = await _users.Find(filter).ToListAsync(cancellationToken);
 
         return products.FirstOrDefault() ?? new User{Id = Guid.Empty};
     }
 
+    /// <summary>
+    /// Decrypts encrypted password. Did not end up using this method but I wanted to leave it in anyways
+    /// </summary>
+    /// <param name="password"></param>
+    /// <param name="salt"></param>
+    /// <returns></returns>
     public string DecryptPassword(string password, string salt)
     {
-        byte[] iv = Encoding.UTF8.GetBytes(salt);
-        byte[] key = Encoding.UTF8.GetBytes(salt);
+        var guidSalt = new Guid(salt).ToByteArray();
+        byte[] iv = guidSalt;
+        byte[] key = guidSalt;
         byte[] buffer = Convert.FromBase64String(password);  
   
         using (Aes aes = Aes.Create())
         {
             aes.Key = key;
-            aes.IV = iv;  
+            aes.IV = iv;
+            aes.Padding = PaddingMode.PKCS7;
+            
             ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);  
   
             using (MemoryStream memoryStream = new MemoryStream(buffer))  
@@ -53,5 +62,37 @@ public class MongoUserSource: IMongoUserSource
                 }  
             }  
         }
+    }
+    
+    private string EncryptPassword(string password, string salt)
+    {
+        var guidSalt = new Guid(salt).ToByteArray();
+        byte[] iv = guidSalt;
+        byte[] key = guidSalt;
+        byte[] array;  
+        
+        using (Aes aes = Aes.Create())  
+        {  
+            aes.Key = key;  
+            aes.IV = iv;
+            aes.Padding = PaddingMode.PKCS7;
+  
+            ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);  
+  
+            using (MemoryStream memoryStream = new MemoryStream())  
+            {  
+                using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))  
+                {  
+                    using (StreamWriter streamWriter = new StreamWriter(cryptoStream))  
+                    {  
+                        streamWriter.Write(password);  
+                    }  
+  
+                    array = memoryStream.ToArray();  
+                }  
+            }  
+        }  
+  
+        return Convert.ToBase64String(array);  
     }
 }

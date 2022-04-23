@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using VeganAPI.Models.Products;
 
 namespace VeganAPI.Controllers;
 
 [Route("[controller]")]
+[Authorize]
 [ApiController]
 public class ProductsController : ControllerBase
 {

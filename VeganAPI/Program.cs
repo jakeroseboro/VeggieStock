@@ -46,8 +46,8 @@ builder.Services
         cfg.SaveToken = true;
         cfg.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidIssuer = null,
-            ValidAudience = null,
+            ValidateAudience = false,
+            ValidateIssuer = false,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtKey"])),
             ClockSkew = TimeSpan.Zero // remove delay of token when expire
         };
@@ -76,6 +76,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors(CorsPolicy);
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

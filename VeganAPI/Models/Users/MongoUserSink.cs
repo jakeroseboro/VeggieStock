@@ -13,7 +13,7 @@ public class MongoUserSink : IMongoUserSink
     {
         var client = new MongoClient(settings.ConnectionString);
         var database = client.GetDatabase(settings.DatabaseName);
-        _users = database.GetCollection<User>(settings.ProductsCollectionName);
+        _users = database.GetCollection<User>(settings.UsersCollectionName);
 
         var indexBuilder = Builders<User>.IndexKeys;
         var indexModel = new CreateIndexModel<User>(indexBuilder
@@ -40,14 +40,16 @@ public class MongoUserSink : IMongoUserSink
 
     private string EncryptPassword(string password, string salt)
     {
-        byte[] iv = Encoding.UTF8.GetBytes(salt);
-        byte[] key = Encoding.UTF8.GetBytes(salt);
+        var guidSalt = new Guid(salt).ToByteArray();
+        byte[] iv = guidSalt;
+        byte[] key = guidSalt;
         byte[] array;  
         
         using (Aes aes = Aes.Create())  
         {  
             aes.Key = key;  
-            aes.IV = iv;  
+            aes.IV = iv;
+            aes.Padding = PaddingMode.PKCS7;
   
             ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);  
   

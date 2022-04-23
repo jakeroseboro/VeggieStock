@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VeganAPI.Models.Users;
 
 namespace VeganAPI.Controllers;
 
 [Route("[controller]")]
+[AllowAnonymous]
 [ApiController]
 public class UsersController : ControllerBase
 {
@@ -16,8 +18,8 @@ public class UsersController : ControllerBase
         _queryService = queryService;
     }
     
-    [HttpGet(Name = nameof(GetProducts))] 
-    public async Task<ActionResult<VerifiedUser>> GetProducts([FromQuery] UserQueryOptions queryOptions)
+    [HttpGet(Name = nameof(GetUser))] 
+    public async Task<ActionResult<VerifiedUser>> GetUser([FromBody] UserQueryOptions queryOptions)
     {
         try
         {
@@ -26,11 +28,28 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
-            return new ObjectResult($"Unable to find products due to {e}")
+            return new ObjectResult($"Unable to find user due to {e}")
             {
                 StatusCode = 500
             };
         }
         
+    }
+
+    [HttpPost(Name = nameof(CreateUser))]
+    public async Task<ActionResult<VerifiedUser>> CreateUser([FromBody] NewUser newUser)
+    {
+        try
+        {
+            var result = await _creationService.CreateUser(newUser, HttpContext.RequestAborted);
+            return result;
+        }
+        catch (Exception e)
+        {
+            return new ObjectResult($"Unable to create user due to {e}")
+            {
+                StatusCode = 500
+            };
+        }
     }
 }
