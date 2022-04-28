@@ -28,15 +28,18 @@ public class UserQueryService: IUserQueryService
             {
                 return new ObjectResult(new {error = "User not found"})
                 {
-                    StatusCode = 500
+                    StatusCode = 404
                 };
             }
 
             if (user?.UserName == null)
-                return new ObjectResult(new {error = "User not found"})
-                {
-                    StatusCode = 500
-                };
+            {
+               return new ObjectResult(new {error = "User not found"})
+               {
+                   StatusCode = 404
+               }; 
+            }
+                
             var token = GenerateJwtToken(user.UserName);
             return user.ToVerifiedUser(token);
         }
@@ -48,7 +51,32 @@ public class UserQueryService: IUserQueryService
             };
         }
     }
-    
+
+    public async Task<ActionResult<IList<string>>> GetAllUsers(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await _source.GetAllUsers(cancellationToken);
+            var users = result.Value?.ToList();
+
+            if (users == null)
+            {
+                return new ObjectResult(new {error = "User not found"})
+                {
+                    StatusCode = 404
+                }; 
+            }
+            return users;
+        }
+        catch (Exception e)
+        {
+            return new ObjectResult(new {error = $"Unable to find user due to {e}"})
+            {
+                StatusCode = 500
+            };
+        }
+    }
+
     private string GenerateJwtToken(string username)
     {
         var claims = new List<Claim>

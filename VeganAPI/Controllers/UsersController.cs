@@ -52,4 +52,21 @@ public class UsersController : ControllerBase
             };
         }
     }
+
+    [HttpGet("GetAllUsers", Name = nameof(GetAllUsers))]
+    public async Task<ActionResult<IList<string>>> GetAllUsers()
+    {
+        try
+        {
+            var result = await _queryService.GetAllUsers(HttpContext.RequestAborted);
+            return result;
+        }
+        catch (Exception e)
+        {
+            return new ObjectResult($"Unable to find users due to {e}")
+            {
+                StatusCode = 404
+            };
+        }
+    }
 }

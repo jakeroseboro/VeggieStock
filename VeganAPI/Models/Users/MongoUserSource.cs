@@ -25,9 +25,29 @@ public class MongoUserSource: IMongoUserSource
         filter &= builder.Eq(x => x.UserName, queryOptions.UserName);
         filter &= builder.Eq(x => x.Password, encrypted);
 
-        var products = await _users.Find(filter).ToListAsync(cancellationToken);
+        var users = await _users.Find(filter).ToListAsync(cancellationToken);
 
-        return products.FirstOrDefault() ?? new User{Id = Guid.Empty};
+        return users.FirstOrDefault() ?? new User{Id = Guid.Empty};
+    }
+
+    public async Task<ActionResult<IList<string>>> GetAllUsers(CancellationToken cancellationToken = default)
+    {
+        var builder = Builders<User>.Filter;
+        var filter = builder.Empty;
+        
+        var users = await _users.Find(filter).ToListAsync(cancellationToken);
+
+        var usernames = new List<string>();
+        
+        if (users.Count > 0)
+        {
+            foreach (var user in users)
+            {
+                usernames.Add(user.UserName);
+            }
+        }
+
+        return usernames;
     }
 
     /// <summary>
