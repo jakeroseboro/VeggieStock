@@ -36,7 +36,7 @@ public class UsersController : ControllerBase
         
     }
 
-    [HttpPost(Name = nameof(CreateUser))]
+    [HttpPost("CreateUser", Name = nameof(CreateUser))]
     public async Task<ActionResult<VerifiedUser>> CreateUser([FromBody] NewUser newUser)
     {
         try
