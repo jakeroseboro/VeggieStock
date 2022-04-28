@@ -18,8 +18,8 @@ public class UsersController : ControllerBase
         _queryService = queryService;
     }
     
-    [HttpGet(Name = nameof(GetUser))] 
-    public async Task<ActionResult<VerifiedUser>> GetUser([FromBody] UserQueryOptions queryOptions)
+    [HttpPost("Login",Name = nameof(Login))] 
+    public async Task<ActionResult<VerifiedUser>> Login([FromBody] UserQueryOptions queryOptions)
     {
         try
         {
