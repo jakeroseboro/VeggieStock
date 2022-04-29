@@ -21,12 +21,12 @@ public class MongoProductSource : IMongoProductSource
         var filter = builder.Empty;
         if (!string.IsNullOrWhiteSpace(queryOptions.Name))
         {
-            filter &= builder.Eq(x => x.Name, queryOptions.Name);
+            filter &= builder.Where(x => x.Name.Contains(queryOptions.Name));
         }
 
         if (!string.IsNullOrWhiteSpace(queryOptions.StoreName))
         {
-            filter &= builder.Where(x => x.Sightings.Any(y => y.Store.Name == queryOptions.StoreName));
+            filter &= builder.Where(x => x.Sightings.Any(y => y.Store.Name.Contains(queryOptions.StoreName)));
         }
 
         var zipcodes = queryOptions.ZipCodes ?? new List<int>();
