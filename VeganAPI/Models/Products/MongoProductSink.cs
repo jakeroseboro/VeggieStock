@@ -7,6 +7,7 @@ namespace VeganAPI.Models.Products;
 public class MongoProductSink : IProductMongoSink
 {
     private readonly IMongoCollection<Product> _products;
+    private readonly Collation _caseInsensitiveCollation = new Collation("en", strength: CollationStrength.Primary);
 
     public MongoProductSink(IMongoDbConnectionSettings settings)
     {
@@ -18,7 +19,7 @@ public class MongoProductSink : IProductMongoSink
         var indexModel = new CreateIndexModel<Product>(indexBuilder
                 .Ascending(x => x.Name)
                 .Ascending(x => x.Brand),
-                new CreateIndexOptions{ Unique = true }
+                new CreateIndexOptions{ Unique = true, Collation = _caseInsensitiveCollation}
         );
         _products.Indexes.CreateOneAsync(indexModel, cancellationToken: CancellationToken.None);
 

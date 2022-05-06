@@ -9,6 +9,7 @@ namespace VeganAPI.Models.Users;
 public class MongoUserSink : IMongoUserSink
 {
     private readonly IMongoCollection<User> _users;
+    private readonly Collation _caseInsensitiveCollation = new Collation("en", strength: CollationStrength.Primary);
     public MongoUserSink(IMongoDbConnectionSettings settings)
     {
         var client = new MongoClient(settings.ConnectionString);
@@ -18,9 +19,9 @@ public class MongoUserSink : IMongoUserSink
         var indexBuilder = Builders<User>.IndexKeys;
         var indexModel = new CreateIndexModel<User>(indexBuilder
             .Ascending(x => x.UserName),
-            new CreateIndexOptions{ Unique = true }
+            new CreateIndexOptions{ Unique = true, Collation = _caseInsensitiveCollation }
         );
-        _users.Indexes.CreateOneAsync(indexModel, cancellationToken: CancellationToken.None);
+        _users.Indexes.CreateOneAsync(indexModel ,cancellationToken: CancellationToken.None);
     }
     
     public async Task<ActionResult<User>> CreateUser(NewUser newUser, CancellationToken cancellationToken = default)
