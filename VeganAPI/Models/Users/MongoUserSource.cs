@@ -9,6 +9,7 @@ namespace VeganAPI.Models.Users;
 public class MongoUserSource: IMongoUserSource
 {
     private readonly IMongoCollection<User> _users;
+    private readonly Collation _caseInsensitiveCollation = new Collation("en", strength: CollationStrength.Primary);
     public MongoUserSource(IMongoDbConnectionSettings settings)
     {
         var client = new MongoClient(settings.ConnectionString);
@@ -17,6 +18,7 @@ public class MongoUserSource: IMongoUserSource
     }
     public async Task<ActionResult<User>> GetUser(UserQueryOptions queryOptions, CancellationToken cancellationToken = default)
     {
+        var findOptions = new FindOptions {Collation = _caseInsensitiveCollation};
         var builder = Builders<User>.Filter;
         var filter = builder.Empty;
 
@@ -25,7 +27,7 @@ public class MongoUserSource: IMongoUserSource
         filter &= builder.Eq(x => x.UserName, queryOptions.UserName);
         filter &= builder.Eq(x => x.Password, encrypted);
 
-        var users = await _users.Find(filter).ToListAsync(cancellationToken);
+        var users = await _users.Find(filter, findOptions).ToListAsync(cancellationToken);
 
         return users.FirstOrDefault() ?? new User{Id = Guid.Empty};
     }

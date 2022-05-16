@@ -7,6 +7,7 @@ namespace VeganAPI.Models.Products;
 public class MongoProductSink : IProductMongoSink
 {
     private readonly IMongoCollection<Product> _products;
+    private readonly Collation _caseInsensitiveCollation = new Collation("en", strength: CollationStrength.Primary);
 
     public MongoProductSink(IMongoDbConnectionSettings settings)
     {
@@ -18,7 +19,7 @@ public class MongoProductSink : IProductMongoSink
         var indexModel = new CreateIndexModel<Product>(indexBuilder
                 .Ascending(x => x.Name)
                 .Ascending(x => x.Brand),
-                new CreateIndexOptions{ Unique = true }
+                new CreateIndexOptions{ Unique = true, Collation = _caseInsensitiveCollation}
         );
         _products.Indexes.CreateOneAsync(indexModel, cancellationToken: CancellationToken.None);
 
@@ -38,7 +39,7 @@ public class MongoProductSink : IProductMongoSink
         var sightings = product.Sightings;
         
         //Get the sighting that matches the store and address 
-        var sighting = sightings.FirstOrDefault(x => x.Store.Name == updateOptions.Sighting.Store.Name && x.ZipCode == updateOptions.Sighting.ZipCode && x.Street == updateOptions.Sighting.Street);
+        var sighting = sightings.FirstOrDefault(x => x.Store.Name.ToLowerInvariant() == updateOptions.Sighting.Store.Name.ToLowerInvariant() && x.ZipCode == updateOptions.Sighting.ZipCode && x.Street.ToLowerInvariant() == updateOptions.Sighting.Street.ToLowerInvariant());
         
         //If this sighting does not exist, add a new one
         if (sighting == null)

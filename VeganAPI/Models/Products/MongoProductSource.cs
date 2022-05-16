@@ -6,6 +6,7 @@ namespace VeganAPI.Models.Products;
 
 public class MongoProductSource : IMongoProductSource
 {
+    private readonly Collation _caseInsensitiveCollation = new Collation("en", strength: CollationStrength.Primary);
     private readonly IMongoCollection<Product> _products;
     
     public MongoProductSource(IMongoDbConnectionSettings settings)
@@ -17,16 +18,17 @@ public class MongoProductSource : IMongoProductSource
     
     public async Task<ActionResult<IList<Product>>> GetProducts(ProductQueryOptions queryOptions, CancellationToken cancellationToken = default)
     {
+        var findOptions = new FindOptions {Collation = _caseInsensitiveCollation};
         var builder = Builders<Product>.Filter;
         var filter = builder.Empty;
         if (!string.IsNullOrWhiteSpace(queryOptions.Name))
         {
-            filter &= builder.Eq(x => x.Name, queryOptions.Name);
+            filter &= builder.Where(x => x.Name.Contains(queryOptions.Name));
         }
 
         if (!string.IsNullOrWhiteSpace(queryOptions.StoreName))
         {
-            filter &= builder.Where(x => x.Sightings.Any(y => y.Store.Name == queryOptions.StoreName));
+            filter &= builder.Where(x => x.Sightings.Any(y => y.Store.Name.Contains(queryOptions.StoreName)));
         }
 
         var zipcodes = queryOptions.ZipCodes ?? new List<int>();
@@ -41,7 +43,7 @@ public class MongoProductSource : IMongoProductSource
             filter &= builder.Eq(x => x.CreatedBy, queryOptions.CreatedBy);
         }
 
-        var products = await _products.Find(filter).ToListAsync(cancellationToken);
+        var products = await _products.Find(filter, findOptions).ToListAsync(cancellationToken);
 
         return products;
     }
